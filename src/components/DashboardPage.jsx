@@ -145,9 +145,9 @@ export default function DashboardPage() {
                 <tbody>
                   {data.competitors.map((comp, idx) => (
                     <tr key={idx}>
-                      <td className="comp-name">{comp.name}</td>
-                      <td className="comp-core">{comp.core}</td>
-                      <td>
+                      <td className="comp-name" data-label="Nome">{comp.name}</td>
+                      <td className="comp-core" data-label="Core Business">{comp.core}</td>
+                      <td data-label="Punto Debole">
                         <span className="comp-weakness">{comp.weakness}</span>
                       </td>
                     </tr>

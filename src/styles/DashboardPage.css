@@ -1,24 +1,21 @@
 .dashboard-container {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
+  min-height: calc(100vh - 64px);
+  min-height: calc(100dvh - 64px);
   width: 100%;
   background-color: var(--bg);
   background-image: radial-gradient(circle at top right, #201335 0%, var(--bg) 60%, var(--bg) 100%);
   color: var(--on-surface);
-  padding: 80px var(--margin-mobile) var(--spacing-xl);
+  padding: var(--spacing-md) var(--margin-mobile) var(--spacing-md);
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-@media (min-width: 1024px) {
-  .dashboard-container {
-    padding: 100px var(--margin-desktop) var(--spacing-xl);
-  }
-}
 
 .dashboard-content {
   position: relative;
   z-index: 10;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -33,6 +30,7 @@
   justify-content: space-between;
   margin-bottom: var(--spacing-sm);
 }
+
 
 .back-btn {
   display: flex;
@@ -64,17 +62,12 @@
 
 /* Bento Grid */
 .bento-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-md);
   width: 100%;
 }
 
-@media (min-width: 768px) {
-  .bento-grid {
-    grid-template-columns: repeat(12, 1fr);
-  }
-}
 
 /* Card base styles */
 .bento-card {
@@ -85,6 +78,7 @@
   flex-direction: column;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
+
 
 .card-title-row {
   display: flex;
@@ -115,11 +109,6 @@
   border-left: 4px solid var(--primary-container);
 }
 
-@media (min-width: 768px) {
-  .card-sintesi {
-    grid-column: span 8;
-  }
-}
 
 .sintesi-text {
   font-family: var(--font-body);
@@ -129,11 +118,6 @@
   margin: 0;
 }
 
-@media (min-width: 768px) {
-  .sintesi-text {
-    font-size: 18px;
-  }
-}
 
 .card-score {
   align-items: center;
@@ -141,11 +125,6 @@
   text-align: center;
 }
 
-@media (min-width: 768px) {
-  .card-score {
-    grid-column: span 4;
-  }
-}
 
 /* Speedometer Widget */
 .speedometer-widget {
@@ -200,13 +179,6 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-@media (min-width: 768px) {
-  .card-verdict {
-    grid-column: span 12;
-    flex-direction: row;
-    align-items: center;
-  }
-}
 
 .verdict-info {
   display: flex;
@@ -249,6 +221,7 @@
   min-width: 180px;
 }
 
+
 .verdict-go {
   --glow-color: rgba(0, 255, 148, 0.2);
   --border-color: #00ff94;
@@ -264,11 +237,6 @@
 }
 
 /* Difficulty Analysis */
-@media (min-width: 768px) {
-  .card-difficolta {
-    grid-column: span 6;
-  }
-}
 
 .diff-content {
   display: flex;
@@ -299,11 +267,6 @@
 }
 
 /* Competitor Table */
-@media (min-width: 768px) {
-  .card-competitors {
-    grid-column: span 6;
-  }
-}
 
 .table-wrapper {
   overflow-x: auto;
@@ -338,10 +301,12 @@
 .comp-name {
   font-weight: 600;
   color: var(--secondary);
+  min-width: 120px;
 }
 
 .comp-core {
   color: var(--on-surface-variant);
+  min-width: 150px;
 }
 
 .comp-weakness {
@@ -355,7 +320,11 @@
   border-radius: var(--rounded-sm);
   text-transform: uppercase;
   letter-spacing: 0.02em;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.4;
 }
+
 
 /* User Personas */
 .personas-title-row {
@@ -373,11 +342,6 @@
   gap: var(--spacing-md);
 }
 
-@media (min-width: 768px) {
-  .personas-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
 
 .persona-card {
   border-left: 2px solid var(--secondary-container);
@@ -454,3 +418,4 @@
   margin: 0;
   line-height: 1.5;
 }
+

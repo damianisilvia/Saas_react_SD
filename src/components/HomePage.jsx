@@ -20,7 +20,7 @@ export default function HomePage() {
       
       <div className="home-content">
         <header className="home-header">
-          <h1 className="home-title">NOME PROGETTO</h1>
+          <h1 className="home-title">MARKETING AI</h1>
           <p className="home-description">
             Valuta all'istante il potenziale della tua idea di business con l'analisi di mercato guidata dall'intelligenza artificiale.
           </p>
