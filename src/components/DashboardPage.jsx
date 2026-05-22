@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { analyzeIdea } from '../utils/analyzer'
 import '../styles/DashboardPage.css'
@@ -10,13 +11,92 @@ export default function DashboardPage() {
   const defaultIdea = "Piattaforma software (SaaS) basata su intelligenza artificiale per l'ottimizzazione automatica delle campagne di marketing sui social media per e-commerce di piccole dimensioni."
   const idea = location.state?.idea || defaultIdea
 
-  // Execute marketing analysis
-  const data = analyzeIdea(idea)
+  // Create state based on the object structure from example.js
+  const [dashboardData, setDashboardData] = useState(() => {
+    const analyzed = analyzeIdea(idea)
+    return {
+      ideaDescription: analyzed.sintesi,
+      successScore: {
+        score: analyzed.score,
+        maxScore: 100,
+        label: analyzed.score >= 80 ? "Potenziale Elevato" : analyzed.score >= 60 ? "Potenziale Moderato" : "Basso Potenziale"
+      },
+      verdettoValidazione: {
+        status: analyzed.verdict,
+        description: "L'analisi algoritmica ha elaborato la fattibilità di esecuzione, i concorrenti di riferimento e le barriere commerciali. Il verdetto indica se l'idea possiede i presupposti per avanzare alla fase operativa."
+      },
+      analisiDifficolta: [
+        {
+          id: "01",
+          title: analyzed.diffParagraph1Title,
+          description: analyzed.diffParagraph1Text
+        },
+        {
+          id: "02",
+          title: analyzed.diffParagraph2Title,
+          description: analyzed.diffParagraph2Text
+        }
+      ],
+      mappaturaCompetitor: analyzed.competitors.map(comp => ({
+        name: comp.name,
+        coreBusiness: comp.core,
+        puntoDebole: comp.weakness
+      })),
+      targetUserPersonas: analyzed.personas.map(persona => ({
+        name: persona.name,
+        role: persona.role.toUpperCase(),
+        avatar: persona.name ? persona.name.charAt(0) : 'U',
+        quote: persona.quote,
+        description: persona.description
+      }))
+    }
+  })
+
+  // Update state if the idea changes
+  useEffect(() => {
+    const analyzed = analyzeIdea(idea)
+    setDashboardData({
+      ideaDescription: analyzed.sintesi,
+      successScore: {
+        score: analyzed.score,
+        maxScore: 100,
+        label: analyzed.score >= 80 ? "Potenziale Elevato" : analyzed.score >= 60 ? "Potenziale Moderato" : "Basso Potenziale"
+      },
+      verdettoValidazione: {
+        status: analyzed.verdict,
+        description: "L'analisi algoritmica ha elaborato la fattibilità di esecuzione, i concorrenti di riferimento e le barriere commerciali. Il verdetto indica se l'idea possiede i presupposti per avanzare alla fase operativa."
+      },
+      analisiDifficolta: [
+        {
+          id: "01",
+          title: analyzed.diffParagraph1Title,
+          description: analyzed.diffParagraph1Text
+        },
+        {
+          id: "02",
+          title: analyzed.diffParagraph2Title,
+          description: analyzed.diffParagraph2Text
+        }
+      ],
+      mappaturaCompetitor: analyzed.competitors.map(comp => ({
+        name: comp.name,
+        coreBusiness: comp.core,
+        puntoDebole: comp.weakness
+      })),
+      targetUserPersonas: analyzed.personas.map(persona => ({
+        name: persona.name,
+        role: persona.role.toUpperCase(),
+        avatar: persona.name ? persona.name.charAt(0) : 'U',
+        quote: persona.quote,
+        description: persona.description
+      }))
+    })
+  }, [idea])
 
   // Speedometer path calculations (radius = 80, path length = Math.PI * 80 = 251.33)
   const r = 80
   const circ = Math.PI * r
-  const strokeDashoffset = circ - (data.score / 100) * circ
+  const strokeDashoffset = circ - (dashboardData.successScore.score / 100) * circ
 
   return (
     <div className="dashboard-container">
@@ -44,7 +124,7 @@ export default function DashboardPage() {
               <span className="card-indicator" />
               <h2 className="card-title">Sintesi Idea Business</h2>
             </div>
-            <p className="sintesi-text">"{data.sintesi}"</p>
+            <p className="sintesi-text">"{dashboardData.ideaDescription}"</p>
           </section>
 
           {/* 2. Success Score Speedometer Card */}
@@ -87,12 +167,12 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="speedometer-score-container">
-                <span className="speedometer-score-num">{data.score}</span>
-                <span className="speedometer-score-max">/100</span>
+                <span className="speedometer-score-num">{dashboardData.successScore.score}</span>
+                <span className="speedometer-score-max">/{dashboardData.successScore.maxScore}</span>
               </div>
             </div>
             <div className="speedometer-label">
-              {data.score >= 80 ? "Potenziale Elevato" : data.score >= 60 ? "Potenziale Moderato" : "Basso Potenziale"}
+              {dashboardData.successScore.label}
             </div>
           </section>
 
@@ -101,11 +181,11 @@ export default function DashboardPage() {
             <div className="verdict-info">
               <h2 className="verdict-title">Verdetto Validazione</h2>
               <p className="verdict-desc">
-                L'analisi algoritmica ha elaborato la fattibilità di esecuzione, i concorrenti di riferimento e le barriere commerciali. Il verdetto indica se l'idea possiede i presupposti per avanzare alla fase operativa.
+                {dashboardData.verdettoValidazione.description}
               </p>
             </div>
-            <div className={`verdict-badge ${data.verdict === 'GO' ? 'verdict-go' : 'verdict-nogo'}`}>
-              Verdetto: {data.verdict}
+            <div className={`verdict-badge ${dashboardData.verdettoValidazione.status === 'GO' ? 'verdict-go' : 'verdict-nogo'}`}>
+              Verdetto: {dashboardData.verdettoValidazione.status}
             </div>
           </section>
 
@@ -116,14 +196,12 @@ export default function DashboardPage() {
               <h2 className="card-title" style={{ color: 'var(--secondary)' }}>Analisi Difficoltà</h2>
             </div>
             <div className="diff-content">
-              <div className="diff-paragraph">
-                <h3 className="diff-paragraph-title">01. {data.diffParagraph1Title}</h3>
-                <p className="diff-paragraph-text">{data.diffParagraph1Text}</p>
-              </div>
-              <div className="diff-paragraph">
-                <h3 className="diff-paragraph-title">02. {data.diffParagraph2Title}</h3>
-                <p className="diff-paragraph-text">{data.diffParagraph2Text}</p>
-              </div>
+              {dashboardData.analisiDifficolta.map((diff) => (
+                <div key={diff.id} className="diff-paragraph">
+                  <h3 className="diff-paragraph-title">{diff.id}. {diff.title}</h3>
+                  <p className="diff-paragraph-text">{diff.description}</p>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -143,12 +221,12 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.competitors.map((comp, idx) => (
+                  {dashboardData.mappaturaCompetitor.map((comp, idx) => (
                     <tr key={idx}>
                       <td className="comp-name" data-label="Nome">{comp.name}</td>
-                      <td className="comp-core" data-label="Core Business">{comp.core}</td>
+                      <td className="comp-core" data-label="Core Business">{comp.coreBusiness}</td>
                       <td data-label="Punto Debole">
-                        <span className="comp-weakness">{comp.weakness}</span>
+                        <span className="comp-weakness">{comp.puntoDebole}</span>
                       </td>
                     </tr>
                   ))}
@@ -165,13 +243,11 @@ export default function DashboardPage() {
 
           {/* 7. User Personas Grid */}
           <div className="personas-grid">
-            {data.personas.map((persona, idx) => {
-              // Extract first letter of name for initials avatar placeholder
-              const initial = persona.name ? persona.name.charAt(0) : 'U'
+            {dashboardData.targetUserPersonas.map((persona, idx) => {
               return (
                 <article key={idx} className="bento-card glass-panel glass-panel-hover persona-card">
                   <div className="persona-header">
-                    <div className="persona-avatar-initials">{initial}</div>
+                    <div className="persona-avatar-initials">{persona.avatar}</div>
                     <div className="persona-meta">
                       <span className="persona-name">{persona.name}</span>
                       <span className="persona-role">{persona.role}</span>
