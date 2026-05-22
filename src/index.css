@@ -2,10 +2,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
 /* Global box-sizing reset */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--on-surface);
+  cursor: pointer;
+
 }
 
 :root {
@@ -23,21 +32,25 @@
   --on-surface-variant: #b9cacb;
   --outline: #849495;
   --outline-variant: #3b494b;
-  
-  --primary: #dbfcff; /* Light Cyan */
-  --primary-container: #00f0ff; /* Electric Cyan */
+
+  --primary: #dbfcff;
+  /* Light Cyan */
+  --primary-container: #00f0ff;
+  /* Electric Cyan */
   --on-primary: #00363a;
   --on-primary-container: #006970;
   --inverse-primary: #006970;
-  
-  --secondary: #d1bcff; /* Digital Violet (Light) */
-  --secondary-container: #7000ff; /* Digital Violet (Vibrant) */
+
+  --secondary: #d1bcff;
+  /* Digital Violet (Light) */
+  --secondary-container: #7000ff;
+  /* Digital Violet (Vibrant) */
   --on-secondary-container: #ddcdff;
-  
+
   --tertiary: #fff5de;
   --on-tertiary: #3b2f00;
   --tertiary-container: #fed639;
-  
+
   --error: #ffb4ab;
   --on-error: #690005;
   --error-container: #93000a;
@@ -76,7 +89,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   background-color: var(--bg);
@@ -130,8 +144,8 @@ html, body {
   inset: 0;
   z-index: 0;
   opacity: 0.05;
-  background-image: 
-    linear-gradient(var(--outline-variant) 1px, transparent 1px), 
+  background-image:
+    linear-gradient(var(--outline-variant) 1px, transparent 1px),
     linear-gradient(90deg, var(--outline-variant) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
