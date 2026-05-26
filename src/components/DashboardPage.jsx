@@ -209,21 +209,7 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          {/* CARD 3: VERDETTO (GO / NO GO) */}
-          <section className="bento-card glass-panel card-verdict">
-            <div className="verdict-info">
-              <h2 className="verdict-title">Verdetto Validazione</h2>
-              <p className="verdict-desc">
-                {dashboardData.verdettoValidazione.description}
-              </p>
-            </div>
-            {/* Applica una classe CSS dinamica in base al fatto che sia 'GO' o meno */}
-            <div className={`verdict-badge ${dashboardData.verdettoValidazione.status === 'GO' ? 'verdict-go' : 'verdict-nogo'}`}>
-              Verdetto: {dashboardData.verdettoValidazione.status}
-            </div>
-          </section>
-
-          {/* CARD 4: ANALISI DIFFICOLTÀ (Ciclo Render) */}
+          {/* CARD 3: ANALISI DIFFICOLTÀ (Ciclo Render) */}
           <section className="bento-card glass-panel card-difficolta">
             <div className="card-title-row">
               <span className="card-indicator card-indicator-secondary" />
@@ -240,6 +226,20 @@ export default function DashboardPage() {
                   <p className="diff-paragraph-text">{diff.description}</p>
                 </div>
               ))}
+            </div>
+          </section>
+
+          {/* CARD 4: VERDETTO (GO / NO GO) */}
+          <section className="bento-card glass-panel card-verdict">
+            <div className="verdict-info">
+              <h2 className="verdict-title">Verdetto Validazione</h2>
+              <p className="verdict-desc">
+                {dashboardData.verdettoValidazione.description}
+              </p>
+            </div>
+            {/* Applica una classe CSS dinamica in base al fatto che sia 'GO' o meno */}
+            <div className={`verdict-badge ${dashboardData.verdettoValidazione.status === 'GO' ? 'verdict-go' : 'verdict-nogo'}`}>
+              Verdetto: {dashboardData.verdettoValidazione.status}
             </div>
           </section>
 

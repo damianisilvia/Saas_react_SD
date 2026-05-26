@@ -252,18 +252,6 @@
   .dashboard-container {
     padding: var(--spacing-md) var(--margin-desktop) var(--spacing-xl);
   }
-  .card-sintesi {
-    grid-column: span 5;
-  }
-  .card-score {
-    grid-column: span 3;
-  }
-  .card-verdict {
-    grid-column: span 4;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch;
-  }
 }
 
 /* Breakpoint: Tablet & Desktop (min-width: 768px) */
@@ -282,24 +270,25 @@
     grid-template-columns: repeat(12, 1fr);
   }
   .card-sintesi {
-    grid-column: span 12;
+    grid-column: span 8;
   }
   .sintesi-text {
     font-size: 18px;
   }
   .card-score {
-    grid-column: span 12;
+    grid-column: span 4;
   }
   .card-verdict {
-    grid-column: span 12;
-    flex-direction: row;
-    align-items: center;
+    grid-column: span 4;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
   }
   .card-difficolta {
-    grid-column: span 6;
+    grid-column: span 8;
   }
   .card-competitors {
-    grid-column: span 6;
+    grid-column: span 12;
   }
   .personas-grid {
     grid-template-columns: repeat(3, 1fr);
