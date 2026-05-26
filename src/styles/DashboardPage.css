@@ -419,3 +419,35 @@
   line-height: 1.5;
 }
 
+/* Helper/modifier classes and nested styling from inline style extraction */
+
+.dashboard-header .text-label-sm {
+  color: var(--on-surface-variant);
+  opacity: 0.6;
+}
+
+.card-score .card-title {
+  margin-bottom: 16px;
+}
+
+.speedometer-active-path {
+  transition: stroke-dashoffset 1s ease-out;
+}
+
+.card-indicator-secondary {
+  background-color: var(--secondary);
+}
+
+.card-indicator-large {
+  height: 20px;
+}
+
+.card-title-secondary {
+  color: var(--secondary);
+}
+
+.personas-title-row h2 {
+  color: var(--on-surface);
+  margin: 0;
+}
+
