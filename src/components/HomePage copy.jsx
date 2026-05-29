@@ -10,30 +10,15 @@ export default function HomePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-
+    setIsLoading(true) // Attiva il loader
     const trimmed = localIdea.trim()
-
-    // Se l'utente ha scritto qualcosa, facciamo partire la magia del caricamento
     if (trimmed) {
-      setIsLoading(true) // 1. Attiva il loader (appare la schermata futuristica!)
-      setIdea(trimmed)   // Salva l'idea nel Context globale
-
-      // 2. Diciamo a React di aspettare 2 secondi (2000 millisecondi) prima di cambiare pagina
-      setTimeout(() => {
-
-        // 3. Passati i 2 secondi, andiamo sulla Dashboard con l'idea
-        navigate('/dashboard', { state: { idea: trimmed } })
-
-        // 4. Spegniamo il loader *DOPO* che la navigazione è avvenuta!
-        setIsLoading(false)
-
-      }, 2000) // 2000 ms = 2 secondi di puro effetto "Wow!"
-
-    } else {
-      // Se l'utente non ha scritto nulla, per sicurezza spegniamo il loader subito
-      setIsLoading(false)
+      setIdea(trimmed)
+      navigate('/dashboard', { state: { idea: trimmed } })
     }
+    setIsLoading(false) // Disattiva il loader (in caso di errore o fallback, anche se qui non c'è il fallback)
   }
+
   return (
     <div className="home-container">
       {/* Background High-Tech Grid Effect */}

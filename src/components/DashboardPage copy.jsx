@@ -8,11 +8,15 @@ export default function DashboardPage() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // Idea di fallback se l'utente arriva sulla pagina direttamente senza passare dalla home
-  const defaultIdea = "Piattaforma software (SaaS) basata su intelligenza artificiale per l'ottimizzazione automatica delle campagne di marketing sui social media per e-commerce di piccole dimensioni."
+  // 1. Recuperiamo l'idea che arriva dalla HomePage (senza fallback!)
+  const idea = location.state?.idea
 
-  // Recupera l'idea passata dalla pagina precedente (tramite router), altrimenti usa quella di default
-  const idea = location.state?.idea || defaultIdea
+  // 2. Controllo di sicurezza: se l'idea non c'è o è vuota, ti rimandiamo subito alla HomePage
+  useEffect(() => {
+    if (!idea || idea.trim() === "") {
+      navigate('/')
+    }
+  }, [idea, navigate])
 
   /* 
     1. INIZIALIZZAZIONE DELLO STATO (useState)
