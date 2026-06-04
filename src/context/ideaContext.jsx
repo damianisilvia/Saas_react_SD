@@ -5,6 +5,7 @@ const IdeaContext = createContext();
 export function IdeaProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [idea, setIdea] = useState('');
+  const [analyzedData, setAnalyzedData] = useState(null);
 
   return (
     <IdeaContext.Provider
@@ -15,6 +16,8 @@ export function IdeaProvider({ children }) {
         setIsloading: setIsLoading,
         idea,
         setIdea,
+        analyzedData,
+        setAnalyzedData
       }}
     >
       {children}

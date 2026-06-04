@@ -1,36 +1,34 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIdea } from '../context/ideaContext'
+import { analyzeIdeaWithAI } from '../services/openaiService'
 import '../styles/HomePage.css'
 
 export default function HomePage() {
   const [localIdea, setLocalIdea] = useState('')
-  const { setIdea, setIsLoading } = useIdea()
+  const { setIdea, setIsLoading, setAnalyzedData } = useIdea()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     const trimmed = localIdea.trim()
 
-    // Se l'utente ha scritto qualcosa, facciamo partire la magia del caricamento
     if (trimmed) {
-      setIsLoading(true) // 1. Attiva il loader (appare la schermata futuristica!)
-      setIdea(trimmed)   // Salva l'idea nel Context globale
+      setIsLoading(true) 
+      setIdea(trimmed)   
 
-      // 2. Diciamo a React di aspettare 2 secondi (2000 millisecondi) prima di cambiare pagina
-      setTimeout(() => {
-
-        // 3. Passati i 2 secondi, andiamo sulla Dashboard con l'idea
+      try {
+        const result = await analyzeIdeaWithAI(trimmed)
+        setAnalyzedData(result)
         navigate('/dashboard', { state: { idea: trimmed } })
-
-        // 4. Spegniamo il loader *DOPO* che la navigazione è avvenuta!
+      } catch (error) {
+        console.error("Errore durante l'analisi AI:", error)
+        alert("Si è verificato un errore durante l'analisi dell'idea.")
+      } finally {
         setIsLoading(false)
-
-      }, 2000) // 2000 ms = 2 secondi di puro effetto "Wow!"
-
+      }
     } else {
-      // Se l'utente non ha scritto nulla, per sicurezza spegniamo il loader subito
       setIsLoading(false)
     }
   }

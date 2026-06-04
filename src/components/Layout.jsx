@@ -24,6 +24,12 @@ export default function Layout({ children }) {
             >
               Dashboard
             </NavLink>
+            <NavLink 
+              to="/login" 
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              Login
+            </NavLink>
           </nav>
         </div>
       </header>
@@ -48,6 +54,13 @@ export default function Layout({ children }) {
         >
           <span className="material-symbols-outlined">analytics</span>
           <span className="bottom-nav-label">Dashboard</span>
+        </NavLink>
+        <NavLink 
+          to="/login" 
+          className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}
+        >
+          <span className="material-symbols-outlined">login</span>
+          <span className="bottom-nav-label">Login</span>
         </NavLink>
       </nav>
     </div>

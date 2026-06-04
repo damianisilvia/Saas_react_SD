@@ -1,137 +1,76 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { analyzeIdea } from '../utils/analyzer'
+import { useIdea } from '../context/ideaContext'
 import '../styles/DashboardPage.css'
-import { Link } from 'react-router-dom'
 
 export default function DashboardPage() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // 1. Recuperiamo l'idea che arriva dalla HomePage (senza fallback!)
-  const idea = location.state?.idea
+  // 1. Recuperiamo l'idea e i dati veri dal Context
+  const { idea, analyzedData } = useIdea()
 
-  // 2. Controllo di sicurezza: se l'idea non c'è o è vuota, ti rimandiamo subito alla HomePage
+  // 2. Controllo di sicurezza: se i dati non sono pronti, si torna in Home
   useEffect(() => {
-    if (!idea || idea.trim() === "") {
+    if (!idea || !idea.trim() || !analyzedData) {
       navigate('/')
     }
-  }, [idea, navigate])
+  }, [idea, analyzedData, navigate])
 
-  /* 
-    1. INIZIALIZZAZIONE DELLO STATO (useState)
-    Qui viene usata una "lazy initialization" (passando una funzione freccia anziché direttamente l'oggetto).
-    In questo modo l'analisi pesante di `analyzeIdea` viene eseguita SOLO al primissimo rendering della pagina.
+  // 🔥 IL MURO DI SICUREZZA: evita crash se i dati non sono ancora mappati
+  if (!idea || !idea.trim() || !analyzedData) {
+    return null
+  }
+
+  /* 🚀 CALCOLO IN TEMPO REALE (Senza blocco useState)
+     Ogni volta che analyzedData si aggiorna con il JSON di Gemini,
+     questo oggetto si popola istantaneamente.
   */
-  const [dashboardData, setDashboardData] = useState(() => {
-    // Esegue la funzione che analizza il testo dell'idea di business
-    const analyzed = analyzeIdea(idea)
+  const dashboardData = {
+    ideaDescription: analyzedData.sintesi || "Nessuna sintesi disponibile",
 
-    // Ritorna l'oggetto di stato strutturato ESATTAMENTE come richiesto dal tuo mockup/example.js
-    return {
-      ideaDescription: analyzed.sintesi,
+    successScore: {
+      score: analyzedData.score || 0,
+      maxScore: 100,
+      label: (analyzedData.score || 0) >= 80 ? "Potenziale Elevato" : (analyzedData.score || 0) >= 60 ? "Potenziale Moderato" : "Basso Potenziale"
+    },
 
-      successScore: {
-        score: analyzed.score,
-        maxScore: 100,
-        // Operatore ternario concatenato per decidere l'etichetta in base al punteggio
-        label: analyzed.score >= 80 ? "Potenziale Elevato" : analyzed.score >= 60 ? "Potenziale Moderato" : "Basso Potenziale"
+    verdettoValidazione: {
+      status: analyzedData.verdict || "N/D",
+      description: "L'analisi in tempo reale ha elaborato la fattibilità di esecuzione, i concorrenti di riferimento e le barriere commerciali. Il verdetto indica se l'idea possiede i presupposti per avanzare alla fase operativa."
+    },
+
+    analisiDifficolta: [
+      {
+        id: "01",
+        title: analyzedData.diffParagraph1Title || "Barriera d'ingresso",
+        description: analyzedData.diffParagraph1Text || "Dettagli non disponibili"
       },
+      {
+        id: "02",
+        title: analyzedData.diffParagraph2Title || "Sostenibilità",
+        description: analyzedData.diffParagraph2Text || "Dettagli non disponibili"
+      }
+    ],
 
-      verdettoValidazione: {
-        status: analyzed.verdict, // es. "GO" o "NO GO"
-        description: "L'analisi algoritmica ha elaborato la fattibilità di esecuzione, i concorrenti di riferimento e le barriere commerciali. Il verdetto indica se l'idea possiede i presupposti per avanzare alla fase operativa."
-      },
+    mappaturaCompetitor: (analyzedData.competitors || []).map(comp => ({
+      name: comp.name || "Nero aziendale",
+      coreBusiness: comp.core || "Non specificato",
+      puntoDebole: comp.weakness || "Non specificato"
+    })),
 
-      // Crea un array fisso prendendo i blocchi di testo sparsi restituiti dall'analizzatore
-      analisiDifficolta: [
-        {
-          id: "01",
-          title: analyzed.diffParagraph1Title,
-          description: analyzed.diffParagraph1Text
-        },
-        {
-          id: "02",
-          title: analyzed.diffParagraph2Title,
-          description: analyzed.diffParagraph2Text
-        }
-      ],
+    targetUserPersonas: (analyzedData.personas || []).map(persona => ({
+      name: persona.name || "Utente Target",
+      role: persona.role ? persona.role.toUpperCase() : "TARGET",
+      avatar: persona.name ? persona.name.charAt(0) : 'U',
+      quote: persona.quote || "Nessuna citazione",
+      description: persona.description || "Descrizione non disponibile"
+    }))
+  }
 
-      /* 
-        Il metodo .map() prende l'array grezzo di competitor (analyzed.competitors) 
-        e lo trasforma (mappa) rinominando le proprietà per adattarle alla tua interfaccia.
-      */
-      mappaturaCompetitor: analyzed.competitors.map(comp => ({
-        name: comp.name,
-        coreBusiness: comp.core,        // trasforma la proprietà 'core' in 'coreBusiness'
-        puntoDebole: comp.weakness      // trasforma 'weakness' in 'puntoDebole'
-      })),
-
-      // Stessa cosa qui: trasforma l'array delle personas standardizzando i dati
-      targetUserPersonas: analyzed.personas.map(persona => ({
-        name: persona.name,
-        role: persona.role.toUpperCase(), // Forza il ruolo in MAIUSCOLO
-        // Se c'è un nome prende la prima lettera per l'avatar, altrimenti mette 'U' (User)
-        avatar: persona.name ? persona.name.charAt(0) : 'U',
-        quote: persona.quote,
-        description: persona.description
-      }))
-    }
-  })
-
-  /*
-    2. AGGIORNAMENTO DLLO STATO (useEffect)
-    Questo blocco "ascolta" la variabile `idea`. Se per qualsiasi motivo l'idea cambia 
-    (es. l'utente ne analizza una nuova), riesegue l'analisi e aggiorna lo stato.
-    I passaggi di trasformazione dei dati qui dentro sono identici a quelli sopra.
-  */
-  useEffect(() => {
-    const analyzed = analyzeIdea(idea)
-    setDashboardData({
-      ideaDescription: analyzed.sintesi,
-      successScore: {
-        score: analyzed.score,
-        maxScore: 100,
-        label: analyzed.score >= 80 ? "Potenziale Elevato" : analyzed.score >= 60 ? "Potenziale Moderato" : "Basso Potenziale"
-      },
-      verdettoValidazione: {
-        status: analyzed.verdict,
-        description: "L'analisi algoritmica ha elaborato la fattibilità di esecuzione, i concorrenti di riferimento e le barriere commerciali. Il verdetto indica se l'idea possiede i presupposti per avanzare alla fase operativa."
-      },
-      analisiDifficolta: [
-        {
-          id: "01",
-          title: analyzed.diffParagraph1Title,
-          description: analyzed.diffParagraph1Text
-        },
-        {
-          id: "02",
-          title: analyzed.diffParagraph2Title,
-          description: analyzed.diffParagraph2Text
-        }
-      ],
-      mappaturaCompetitor: analyzed.competitors.map(comp => ({
-        name: comp.name,
-        coreBusiness: comp.core,
-        puntoDebole: comp.weakness
-      })),
-      targetUserPersonas: analyzed.personas.map(persona => ({
-        name: persona.name,
-        role: persona.role.toUpperCase(),
-        avatar: persona.name ? persona.name.charAt(0) : 'U',
-        quote: persona.quote,
-        description: persona.description
-      }))
-    })
-  }, [idea]) // <- Dependency array: l'effetto scatta solo quando cambia questa variabile
-
-  /*
-    3. CALCOLO DINAMICO GRAFICA SVG (Tachimetro)
-    Calcola la lunghezza della linea del tachimetro (semicircolo) usando la geometria.
-    Poi calcola lo 'strokeDashoffset' per riempire la barra in base al punteggio (0-100).
-  */
+  // 3. CALCOLO DINAMICO GRAFICA SVG (Tachimetro)
   const r = 80
-  const circ = Math.PI * r // Circonferenza del semicerchio
+  const circ = Math.PI * r
   const strokeDashoffset = circ - (dashboardData.successScore.score / 100) * circ
 
   return (
@@ -139,7 +78,6 @@ export default function DashboardPage() {
       <div className="tech-bg-grid" />
 
       <main className="dashboard-content">
-        {/* Pulsante di navigazione indietro */}
         <header className="dashboard-header">
           <button onClick={() => navigate('/')} className="back-btn">
             <span className="material-symbols-outlined">arrow_back</span>
@@ -150,7 +88,6 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {/* Layout a Griglia (Bento Grid) */}
         <div className="bento-grid">
 
           {/* CARD 1: SINTESI IDEA */}
@@ -159,11 +96,10 @@ export default function DashboardPage() {
               <span className="card-indicator" />
               <h2 className="card-title">Sintesi Idea Business</h2>
             </div>
-            {/* Mostra la descrizione salvata nello stato */}
             <p className="sintesi-text">"{dashboardData.ideaDescription}"</p>
           </section>
 
-          {/* CARD 2: TACHIMETRO DEL PUNTEGGIO */}
+          {/* CARD 2: TACHIMETRO */}
           <section className="bento-card glass-panel card-score">
             <h2 className="card-title">Success Score</h2>
             <div className="speedometer-widget">
@@ -181,7 +117,6 @@ export default function DashboardPage() {
                     </feMerge>
                   </filter>
                 </defs>
-                {/* Arco di sfondo grigio */}
                 <path
                   d="M 20 100 A 80 80 0 0 1 180 100"
                   fill="none"
@@ -189,7 +124,6 @@ export default function DashboardPage() {
                   strokeWidth="12"
                   strokeLinecap="round"
                 />
-                {/* Arco colorato dinamico: usa lo strokeDashoffset calcolato prima */}
                 <path
                   className="speedometer-active-path"
                   d="M 20 100 A 80 80 0 0 1 180 100"
@@ -202,7 +136,6 @@ export default function DashboardPage() {
                   filter="url(#gaugeGlow)"
                 />
               </svg>
-              {/* Testo centrale con il voto */}
               <div className="speedometer-score-container">
                 <span className="speedometer-score-num">{dashboardData.successScore.score}</span>
                 <span className="speedometer-score-max">/{dashboardData.successScore.maxScore}</span>
@@ -213,17 +146,13 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          {/* CARD 3: ANALISI DIFFICOLTÀ (Ciclo Render) */}
+          {/* CARD 3: ANALISI DIFFICOLTÀ */}
           <section className="bento-card glass-panel card-difficolta">
             <div className="card-title-row">
               <span className="card-indicator card-indicator-secondary" />
               <h2 className="card-title card-title-secondary">Analisi Difficoltà</h2>
             </div>
             <div className="diff-content">
-              {/* 
-                Prende l'array 'analisiDifficolta' dallo stato e cicla con .map() 
-                per generare un blocco HTML/JSX per ogni paragrafo trovato.
-              */}
               {dashboardData.analisiDifficolta.map((diff) => (
                 <div key={diff.id} className="diff-paragraph">
                   <h3 className="diff-paragraph-title">{diff.id}. {diff.title}</h3>
@@ -233,7 +162,7 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          {/* CARD 4: VERDETTO (GO / NO GO) */}
+          {/* CARD 4: VERDETTO */}
           <section className="bento-card glass-panel card-verdict">
             <div className="verdict-info">
               <h2 className="verdict-title">Verdetto Validazione</h2>
@@ -241,13 +170,12 @@ export default function DashboardPage() {
                 {dashboardData.verdettoValidazione.description}
               </p>
             </div>
-            {/* Applica una classe CSS dinamica in base al fatto che sia 'GO' o meno */}
-            <div className={`verdict-badge ${dashboardData.verdettoValidazione.status === 'GO' ? 'verdict-go' : 'verdict-nogo'}`}>
+            <div className={`verdict-badge ${dashboardData.verdettoValidazione.status === 'GO' || dashboardData.verdettoValidazione.status === 'APPROVATO' ? 'verdict-go' : 'verdict-nogo'}`}>
               Verdetto: {dashboardData.verdettoValidazione.status}
             </div>
           </section>
 
-          {/* CARD 5: TABELLA DEI COMPETITOR (Ciclo Render) */}
+          {/* CARD 5: TABELLA COMPETITOR */}
           <section className="bento-card glass-panel card-competitors">
             <div className="card-title-row">
               <span className="card-indicator card-indicator-secondary" />
@@ -263,7 +191,6 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {/* Cicla sull'array dei competitor inserendo i dati nelle righe (tr) della tabella */}
                   {dashboardData.mappaturaCompetitor.map((comp, idx) => (
                     <tr key={idx}>
                       <td className="comp-name" data-label="Nome">{comp.name}</td>
@@ -284,14 +211,12 @@ export default function DashboardPage() {
             <h2 className="text-headline-md">Target User Personas</h2>
           </div>
 
-          {/* CARD 6 & 7: GRIGLIA PERSONAS (Ciclo Render) */}
+          {/* CARD 6 & 7: GRIGLIA PERSONAS */}
           <div className="personas-grid">
-            {/* Cicla sull'array targetUserPersonas e genera una card per ogni utente target */}
             {dashboardData.targetUserPersonas.map((persona, idx) => {
               return (
                 <article key={idx} className="bento-card glass-panel glass-panel-hover persona-card">
                   <div className="persona-header">
-                    {/* Visualizza l'iniziale della persona dentro il cerchio-avatar */}
                     <div className="persona-avatar-initials">{persona.avatar}</div>
                     <div className="persona-meta">
                       <span className="persona-name">{persona.name}</span>
