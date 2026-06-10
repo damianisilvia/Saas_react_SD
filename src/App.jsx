@@ -6,6 +6,7 @@ import NotFoundPage from './components/NotFoundPage'
 import Layout from './components/Layout'
 import Loader from './components/Loader'
 import { IdeaProvider, useIdea } from './context/ideaContext'
+import { AuthProvider } from './context/AuthContext'
 
 function AppContent() {
   const { isLoading } = useIdea()
@@ -29,11 +30,14 @@ function AppContent() {
 
 function App() {
   return (
-    <IdeaProvider>
-      <AppContent />
-    </IdeaProvider>
+    <AuthProvider>
+      <IdeaProvider>
+        <AppContent />
+      </IdeaProvider>
+    </AuthProvider>
   )
 }
 
 export default App
+
 

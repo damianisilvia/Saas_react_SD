@@ -1,18 +1,33 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import '../styles/LoginPage.css'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const { login, loading } = useAuth()
+  const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setErrorMsg('')
+    
     console.log('--- Dati di Accesso ---')
     console.log('Email:', email)
-    console.log('Password:', password)
     console.log('-----------------------')
-    alert(`Accesso effettuato! Controlla la console per i dettagli.`)
+    
+    const { data, error } = await login(email, password)
+    
+    if (error) {
+      setErrorMsg(error.message || 'Errore durante l\'accesso')
+    } else {
+      alert(`Accesso effettuato con successo!`)
+      navigate('/dashboard')
+    }
   }
+
 
   return (
     <div className="login-container">
@@ -62,8 +77,10 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button type="submit" className="login-btn">
-            Accedi
+          {errorMsg && <p className="login-error-message" style={{ color: 'red', marginTop: '10px' }}>{errorMsg}</p>}
+
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? 'Accesso in corso...' : 'Accedi'}
           </button>
         </form>
       </div>
