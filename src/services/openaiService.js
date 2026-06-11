@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function analyzeIdeaWithAI(userIdea) {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
@@ -7,9 +7,9 @@ export async function analyzeIdeaWithAI(userIdea) {
     throw new Error("Chiave API mancante nel file .env!");
   }
 
+  // Inizializziamo l'SDK ufficiale di Google
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  // 🎯 PROMPT SUPER-BLINDATO SUL TUO SCHEMA DI INPUT/OUTPUT
   const systemPrompt = `Sei un esperto analista di marketing e business. Analizza l'idea inviata dall'utente e restituisci TASSATIVAMENTE un unico oggetto JSON in lingua italiana, attenendoti a questo schema preciso:
 
   {
@@ -38,19 +38,25 @@ export async function analyzeIdeaWithAI(userIdea) {
   3. Sii coerente: se lo score è basso (es. meno di 50), il verdetto DEVE essere 'NO GO'.`;
 
   try {
+    // Configuriamo il modello corretto con le istruzioni di sistema
     const model = genAI.getGenerativeModel({
-      model: "gemini-3.5-flash",
-      generationConfig: { responseMimeType: "application/json" }
+      model: "gemini-2.5-flash",
+      systemInstruction: systemPrompt,
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
     });
 
-    const result = await model.generateContent(`${systemPrompt}\n\nEcco l'idea da analizzare:\n${userIdea}`);
-    const response = await result.response;
-    const content = response.text().trim();
+    // ✨ CORREZIONE ERRORE 400: Passiamo il contenuto nel formato corretto richiesto da Google!
+    const response = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: userIdea }] }]
+    });
 
+    const content = response.response.text().trim();
     const parsedData = JSON.parse(content);
 
-    // 🛡️ DOPPIO CONTROLLO DI SICUREZZA IN CODE (Se l'AI sgarra la logica matematica)
-    if (parsedData.score < 60) {
+    // 🛡️ DOPPIO CONTROLLO DI SICUREZZA IN CODE
+    if (Number(parsedData.score) < 60) {
       parsedData.verdict = "NO GO";
     } else {
       parsedData.verdict = "GO";
@@ -59,7 +65,7 @@ export async function analyzeIdeaWithAI(userIdea) {
     return parsedData;
 
   } catch (error) {
-    console.error("Errore durante l'analisi dell'idea con Gemini:", error);
+    console.error("Errore dettagliato durante l'analisi con Gemini:", error);
     throw error;
   }
 }
