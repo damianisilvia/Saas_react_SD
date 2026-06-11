@@ -5,6 +5,7 @@ import LoginPage from './components/LoginPage'
 import NotFoundPage from './components/NotFoundPage'
 import Layout from './components/Layout'
 import Loader from './components/Loader'
+import ProtectedRoute from './components/ProtectedRoute'
 import { IdeaProvider, useIdea } from './context/ideaContext'
 import { AuthProvider } from './context/AuthContext'
 
@@ -17,8 +18,13 @@ function AppContent() {
       <BrowserRouter>
         <Layout>
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            {/* Private Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+            </Route>
+
+            {/* Public Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
@@ -39,5 +45,6 @@ function App() {
 }
 
 export default App
+
 
 
