@@ -1,0 +1,109 @@
+/* ---------------------------------------------------------------
+   LogoutButton — Stile secondario da DESIGN.md:
+   "Solo bordo Cyan (1px) con testo Cyan.
+    Effetto hover con riempimento al 10% di opacità."
+   --------------------------------------------------------------- */
+
+/* === VARIANT: Secondary (default — HomePage) === */
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-base);
+  align-self: center;
+  padding: 14px 40px;
+  background: transparent;
+  color: var(--primary-container);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid var(--primary-container);
+  border-radius: var(--rounded-md);
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logout-btn:hover {
+  background: rgba(0, 240, 255, 0.10);
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.logout-btn:active {
+  transform: translateY(1px);
+}
+
+.logout-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.logout-btn-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.logout-btn:hover .logout-btn-icon {
+  transform: translateX(2px);
+}
+
+
+/* === VARIANT: Nav Desktop === */
+.logout-nav-btn {
+  background: transparent;
+  border: 1px solid var(--primary-container);
+  color: var(--primary-container);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logout-nav-btn:hover {
+  background: rgba(0, 240, 255, 0.10);
+  color: var(--on-surface);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+}
+
+.logout-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* === VARIANT: Nav Mobile (Bottom Bar) === */
+.logout-nav-mobile {
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logout-nav-mobile:hover {
+  opacity: 0.9;
+  color: var(--on-surface);
+}
+
+.logout-nav-mobile:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+/* === Responsive === */
+@media (max-width: 480px) {
+  .logout-btn {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 32px;
+    font-size: 12px;
+  }
+}

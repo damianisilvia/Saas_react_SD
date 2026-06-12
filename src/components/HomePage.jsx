@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIdea } from '../context/ideaContext'
 import { analyzeIdeaWithAI } from '../services/openaiService'
+import LogoutButton from './LogoutButton'
 import '../styles/HomePage.css'
 
 export default function HomePage() {
@@ -63,6 +64,8 @@ export default function HomePage() {
             Convalida Progetto
           </button>
         </form>
+
+        <LogoutButton variant="secondary" />
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import LogoutButton from './LogoutButton'
 import '../styles/Layout.css'
 
 export default function Layout({ children }) {
@@ -30,6 +31,7 @@ export default function Layout({ children }) {
             >
               Login
             </NavLink>
+            <LogoutButton variant="nav" />
           </nav>
         </div>
       </header>
@@ -62,6 +64,7 @@ export default function Layout({ children }) {
           <span className="material-symbols-outlined">login</span>
           <span className="bottom-nav-label">Login</span>
         </NavLink>
+        <LogoutButton variant="nav-mobile" />
       </nav>
     </div>
   )

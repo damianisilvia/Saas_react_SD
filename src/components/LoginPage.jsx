@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../styles/LoginPage.css'
@@ -7,18 +7,25 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
-  const { login, loading } = useAuth()
+  const { login, loading, user } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true })
+    }
+  }, [user, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMsg('')
     
+    const trimmedEmail = email.trim()
     console.log('--- Dati di Accesso ---')
-    console.log('Email:', email)
+    console.log('Email:', trimmedEmail)
     console.log('-----------------------')
     
-    const { data, error } = await login(email, password)
+    const { data, error } = await login(trimmedEmail, password)
     
     if (error) {
       setErrorMsg(error.message || 'Errore durante l\'accesso')

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import '../styles/LogoutButton.css'
+import './LogoutButton.css'
 
 /**
  * LogoutButton — Bottone di logout riutilizzabile.
@@ -15,7 +15,7 @@ export default function LogoutButton({ variant = 'secondary' }) {
 
   const handleLogout = async () => {
     await logout()
-    navigate('/')
+    navigate('/login')
   }
 
   // Non mostrare se l'utente non è autenticato
