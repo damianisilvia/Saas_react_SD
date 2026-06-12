@@ -24,6 +24,8 @@ Il progetto è stato strutturato separando nettamente la logica di frontend, la 
 * **Design Dark Moderno:** Interfaccia scura ad alto contrasto con accenti neon ciano e viola, ispirata ai moderni trend tecnologici.
 * **Approccio Mobile-First:** Ottimizzazione nativa per smartphone, inclusa una *Bottom Navigation Bar* ergonomica e scritte ridimensionate dinamicamente per massimizzare la leggibilità.
 * **Effetti Visivi Avanzati:** Layout basati su griglie bento, pannelli in stile *Glassmorphism* (sfocatura dello sfondo tramite proprietà CSS) e micro-animazioni fluide.
+* * ** PROTOTIPO STITCH (anche qui con Agente OpenAi collegato e importato DESIGN.md). 
+  
 
 ---
 
