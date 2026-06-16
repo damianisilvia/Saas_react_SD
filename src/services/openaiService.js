@@ -37,35 +37,57 @@ export async function analyzeIdeaWithAI(userIdea) {
   2. Genera ESATTAMENTE 3 personas e ESATTAMENTE 3 competitors realistici per la nicchia dell'idea.
   3. Sii coerente: se lo score è basso (es. meno di 50), il verdetto DEVE essere 'NO GO'.`;
 
-  try {
-    // Configuriamo il modello corretto con le istruzioni di sistema
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      systemInstruction: systemPrompt,
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
+  let tentativi = 3;
+  const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
-    // ✨ CORREZIONE ERRORE 400: Passiamo il contenuto nel formato corretto richiesto da Google!
-    const response = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: userIdea }] }]
-    });
+  while (tentativi > 0) {
+    try {
+      // Configuriamo il modello corretto con le istruzioni di sistema
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        systemInstruction: systemPrompt,
+        generationConfig: {
+          responseMimeType: "application/json",
+        },
+      });
 
-    const content = response.response.text().trim();
-    const parsedData = JSON.parse(content);
+      // ✨ CORREZIONE ERRORE 400: Passiamo il contenuto nel formato corretto richiesto da Google!
+      const response = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: userIdea }] }]
+      });
 
-    // 🛡️ DOPPIO CONTROLLO DI SICUREZZA IN CODE
-    if (Number(parsedData.score) < 60) {
-      parsedData.verdict = "NO GO";
-    } else {
-      parsedData.verdict = "GO";
+      const content = response.response.text().trim();
+      const parsedData = JSON.parse(content);
+
+      // 🛡️ DOPPIO CONTROLLO DI SICUREZZA IN CODE
+      if (Number(parsedData.score) < 60) {
+        parsedData.verdict = "NO GO";
+      } else {
+        parsedData.verdict = "GO";
+      }
+
+      return parsedData;
+
+    } catch (error) {
+      console.error(`Errore di connessione a Gemini (Tentativi rimasti: ${tentativi - 1}):`, error.message);
+      
+      // Controllo se l'errore è un 503 (High demand) o un errore di rete temporaneo
+      const errorMsg = error?.message?.toLowerCase() || "";
+      const isTemporaryError = error?.status === 503 || errorMsg.includes("503") || errorMsg.includes("high demand") || errorMsg.includes("network") || errorMsg.includes("fetch");
+
+      tentativi--;
+
+      if (tentativi === 0 || !isTemporaryError) {
+        // Se finiamo i tentativi ed era un errore temporaneo, lanciamo un errore specifico
+        if (isTemporaryError) {
+          throw new Error("SERVICE_UNAVAILABLE");
+        }
+        // Altrimenti lanciamo l'errore standard
+        throw error;
+      }
+
+      // Attendiamo 1.5 secondi prima di riprovare
+      await delay(1500); 
     }
-
-    return parsedData;
-
-  } catch (error) {
-    console.error("Errore dettagliato durante l'analisi con Gemini:", error);
-    throw error;
   }
 }

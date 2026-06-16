@@ -25,7 +25,14 @@ export default function HomePage() {
         navigate('/dashboard', { state: { idea: trimmed } })
       } catch (error) {
         console.error("Errore durante l'analisi AI:", error)
-        alert("Si è verificato un errore durante l'analisi dell'idea.")
+        
+        // Controlla se l'errore è dovuto ai server sovraccarichi
+        if (error.message === "SERVICE_UNAVAILABLE") {
+          alert("I server di Gemini sono momentaneamente carichi, per favore riprova tra qualche secondo.");
+        } else {
+          // Errore generico o inatteso
+          alert("Si è verificato un errore durante l'analisi dell'idea. Verifica i tuoi dati e riprova.");
+        }
       } finally {
         setIsLoading(false)
       }
